@@ -18,3 +18,8 @@ if(WEBROUTE_COMPILE_EXAMPLE_APPLICATIONS)
   add_subdirectory(examples/http-server)
   # add_subdirectory(examples/https-server)
 endif(WEBROUTE_COMPILE_EXAMPLE_APPLICATIONS)
+
+# Documentation
+if(WEBROUTE_COMPILE_DOCUMENTATION)
+  add_subdirectory(docs)
+endif(WEBROUTE_COMPILE_DOCUMENTATION)
