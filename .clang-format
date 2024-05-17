@@ -1,0 +1,17 @@
+---
+AlignEscapedNewlines: Left
+AlignTrailingComments: true
+BasedOnStyle: WebKit
+BraceWrapping:
+  AfterFunction: true
+BreakBeforeBraces: Attach
+BreakBeforeInheritanceComma: true
+BreakConstructorInitializers: BeforeComma
+IndentPPDirectives: AfterHash
+IndentRequiresClause: false
+IndentWidth: 4
+NamespaceIndentation: None
+QualifierAlignment: Right
+RemoveSemicolon: true
+RequiresClausePosition: WithFollowing
+SpaceAfterTemplateKeyword: false
