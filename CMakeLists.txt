@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # WebRoute
-add_library(WebRoute src/webroute.cpp)
+add_library(WebRoute src/log.cpp src/webroute.cpp)
 target_include_directories(WebRoute PRIVATE include)
 
 # Example Applications
