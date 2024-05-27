@@ -17,6 +17,8 @@ int main(int argc, char* argv[]) {
     app.addRoute(GET, "/", RootGETRoute);
     app.addRoute(POST, "/", RootPOSTRoute);
 
+    app.addRoute(GET, "/:index", RootGETRoute);
+
     if (app.connect() == WEBROUTE_ERR) {
         app.printError();
     }
