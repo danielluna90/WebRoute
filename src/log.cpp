@@ -1,8 +1,5 @@
 #include "log.h"
 
-#include <memory>
-#include <string>
-
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
