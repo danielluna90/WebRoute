@@ -19,19 +19,19 @@ void Log::Print(LogLevel level, std::string fmt, ...) {
     }
 
     switch (level) {
-    case CRITICAL:
+    case LogLevel::CRITICAL:
         levelStr = "CRITICAL";
         break;
-    case ERROR:
+    case LogLevel::ERROR:
         levelStr = "ERROR";
         break;
-    case WARN:
+    case LogLevel::WARN:
         levelStr = "WARN";
         break;
-    case INFO:
+    case LogLevel::INFO:
         levelStr = "INFO";
         break;
-    case TRACE:
+    case LogLevel::TRACE:
         levelStr = "TRACE";
         break;
     default:

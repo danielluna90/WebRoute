@@ -14,10 +14,10 @@ int main(int argc, char* argv[]) {
     std::cout << "Hello, World!" << std::endl;
 
     WebRouteApplication app = WebRouteApplication({ .HTTPS = false });
-    app.addRoute(GET, "/", RootGETRoute);
-    app.addRoute(POST, "/", RootPOSTRoute);
+    app.addRoute(HTTPMethods::GET, "/", RootGETRoute);
+    app.addRoute(HTTPMethods::POST, "/", RootPOSTRoute);
 
-    app.addRoute(GET, "/:index", RootGETRoute);
+    app.addRoute(HTTPMethods::GET, "/:index", RootGETRoute);
 
     if (app.connect() == WEBROUTE_ERR) {
         app.printError();

@@ -2,7 +2,7 @@
 
 #include <string>
 
-enum LogLevel {
+enum class LogLevel {
     TRACE,
     INFO,
     WARN,
