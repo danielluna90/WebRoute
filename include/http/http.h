@@ -5,7 +5,9 @@ enum class HTTPMethods {
     GET,
     PUT,
     PATCH,
-    DELETE
+    DELETE,
+
+    UNKNOWN
 };
 
 enum class HTTPVersion {

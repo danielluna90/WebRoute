@@ -47,7 +47,6 @@ private:
 
 private:
     AppConfiguration m_Config;
-    HTTPParser m_HTTPParser;
 
     int m_Socket;
 };

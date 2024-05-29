@@ -1,10 +1,14 @@
 #pragma once
 
+#include "http/http.h"
 #include "request.h"
 
-enum class HTTPParserStatus {
-    OK,
-    ERROR,
+enum class HTTPParserState {
+    STATUS_LINE,
+    HEADERS,
+    BODY,
+    DONE,
+    ERROR
 };
 
 class HTTPParser {
@@ -12,7 +16,12 @@ public:
     HTTPParser() = default;
     ~HTTPParser() = default;
 
-    HTTPParserStatus parseHTTPBuffer(HTTPRequest& req, std::string& msgBuffer);
+    void parseHTTPBuffer(HTTPRequest& req, std::string& msgBuffer);
+    const HTTPParserState getState() { return m_State; }
 
 private:
+    HTTPMethods getHTTPMethodFromStr(const std::string& methodStr);
+
+private:
+    HTTPParserState m_State = HTTPParserState::STATUS_LINE;
 };

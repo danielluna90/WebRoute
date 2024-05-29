@@ -1,42 +1,45 @@
 #include "http/parser.h"
 
 #include <sstream>
+#include <string>
 
 #include "http/http.h"
 #include "log.h"
 
-int const HTTP_STATUS_LINE_VALUE_COUNT = 3;
+const int HTTP_STATUS_LINE_VALUE_COUNT = 3;
 
-HTTPParserStatus HTTPParser::parseHTTPBuffer(HTTPRequest& req, std::string& msgBuffer) {
+const int HTTP_LINE_TERMINATOR_LENGTH = 2;
+static const char HTTP_DELIMITER[] = "\r\n";
+static const char HTTP_HEADER_DELIMITER = ':';
+
+void HTTPParser::parseHTTPBuffer(HTTPRequest& req, std::string& msgBuffer) {
     size_t nextLinePos;
     std::string nextLine;
 
-    while ((nextLinePos = msgBuffer.find("\r\n")) != std::string::npos || req.hasBody) {
+    while ((nextLinePos = msgBuffer.find(HTTP_DELIMITER)) != std::string::npos || m_State == HTTPParserState::BODY) {
         nextLine = msgBuffer.substr(0, nextLinePos);
 
-        if (req.uri.empty()) {
+        if (m_State == HTTPParserState::STATUS_LINE) {
             // Parse Status Line
             std::stringstream statusLine(nextLine);
             std::string s;
-
-            Log::Print(LogLevel::INFO, "Status Line: %s", nextLine.c_str());
 
             int i = 0;
             while (std::getline(statusLine, s, ' ')) {
                 if (i == 0) {
                     // HTTP Method
-                    req.method = HTTPMethods::GET;
+                    req.method = getHTTPMethodFromStr(s);
                 } else if (i == 1) {
                     // URI
                     req.uri = s;
-
                 } else if (i == 2) {
                     // HTTP Version
                     req.version = HTTPVersion::HTTP_VERSION_1_1;
                 } else {
                     Log::Print(LogLevel::CRITICAL, "HTTP status line contains more than 3 values.");
 
-                    return HTTPParserStatus::ERROR;
+                    m_State = HTTPParserState::ERROR;
+                    return;
                 }
 
                 i++;
@@ -45,27 +48,52 @@ HTTPParserStatus HTTPParser::parseHTTPBuffer(HTTPRequest& req, std::string& msgB
             if (i != HTTP_STATUS_LINE_VALUE_COUNT) {
                 Log::Print(LogLevel::CRITICAL, "HTTP status line contains less than 3 values.");
 
-                return HTTPParserStatus::ERROR;
+                m_State = HTTPParserState::ERROR;
+                return;
             }
 
-            msgBuffer.erase(0, nextLinePos + 2);
-            continue;
-        }
+            m_State = HTTPParserState::HEADERS;
+        } else if (m_State == HTTPParserState::HEADERS) {
+            if (nextLine.empty()) {
+                m_State = HTTPParserState::BODY;
+                continue;
+            }
 
-        if (nextLine.empty()) {
-            msgBuffer.erase(0, nextLinePos + 2);
-            req.hasBody = true;
-            continue;
-        }
+            std::stringstream header(nextLine);
+            std::string fieldName;
+            std::string fieldVal;
 
-        if (req.hasBody) {
+            std::getline(header, fieldName, HTTP_HEADER_DELIMITER);
+            std::getline(header, fieldVal, HTTP_HEADER_DELIMITER);
+
+            while (fieldVal[0] == ' ')
+                fieldVal.erase(0, 1);
+
+            while (fieldVal[fieldVal.size() - 1] == ' ')
+                fieldVal.pop_back();
+
+            req.headers[fieldName] = fieldVal;
+        } else if (m_State == HTTPParserState::BODY) {
+            if (req.headers.find("Content-Length") == req.headers.end()) {
+                m_State = HTTPParserState::DONE;
+                return;
+            }
+
             Log::Print(LogLevel::INFO, "Message Body: %s", nextLine.c_str());
-        } else {
-            Log::Print(LogLevel::INFO, "Header Field: %s", nextLine.c_str());
+            req.body.append(msgBuffer);
 
-            msgBuffer.erase(0, nextLinePos + 2);
+            break;
         }
+
+        if (m_State != HTTPParserState::BODY)
+            msgBuffer.erase(0, nextLinePos + HTTP_LINE_TERMINATOR_LENGTH);
+    }
+}
+
+HTTPMethods HTTPParser::getHTTPMethodFromStr(const std::string& methodStr) {
+    if (methodStr == "GET") {
+        return HTTPMethods::GET;
     }
 
-    return HTTPParserStatus::OK;
+    return HTTPMethods::UNKNOWN;
 }

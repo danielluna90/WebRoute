@@ -90,11 +90,12 @@ void WebRouteApplication::handleConnection(int clientSocket) {
     bool quit = true;
 
     int sizeRecv, msgIndex = 0;
-    uint16_t const CHUNK_SIZE = 8192;
+    const uint16_t CHUNK_SIZE = 8192;
     char buffer[CHUNK_SIZE];
 
     std::string msg;
 
+    HTTPParser parser;
     HTTPRequest req;
 
     while (true) {
@@ -108,7 +109,10 @@ void WebRouteApplication::handleConnection(int clientSocket) {
 
             Log::Print(LogLevel::INFO, "Recieved HTTP Request: %s", msg.c_str());
 
-            m_HTTPParser.parseHTTPBuffer(req, msg);
+            parser.parseHTTPBuffer(req, msg);
+
+            if (parser.getState() == HTTPParserState::DONE)
+                break;
         } else {
             Log::Print(LogLevel::CRITICAL, "recv() failed");
 

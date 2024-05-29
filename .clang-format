@@ -11,7 +11,7 @@ IndentPPDirectives: AfterHash
 IndentRequiresClause: false
 IndentWidth: 4
 NamespaceIndentation: None
-QualifierAlignment: Right
+QualifierAlignment: Left
 RemoveSemicolon: true
 RequiresClausePosition: WithFollowing
 SpaceAfterTemplateKeyword: false

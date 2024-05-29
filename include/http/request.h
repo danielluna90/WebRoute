@@ -8,11 +8,9 @@
 struct HTTPRequest {
     HTTPMethods method;
     HTTPVersion version;
-
     std::string uri;
-    std::unordered_map<std::string, std::string> headers;
 
-    bool hasBody = false;
+    std::unordered_map<std::string, std::string> headers;
     std::string body;
 
     std::string raw;
